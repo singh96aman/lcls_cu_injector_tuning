@@ -25,78 +25,48 @@ from IPython.display import clear_output
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler,MinMaxScaler
 
-PATH = ''
-screen ='OTR2'
-NAME = 'v3b_cnsga_'
-
-with open(PATH+NAME+screen+'_list_dict.json') as json_file:
-    json_names = json.load(json_file)
-    
-#inputs and outputs in raw data
-output_names=json_names['out_'+screen+'_vars']
-input_names = json_names['input_vars']
-
-#load model info
-model_info = json.load(open('./model_info.json'))
-
-#inputs and outputs model is  trained on
-model_in_list = model_info['model_in_list']
-model_out_list = model_info['model_out_list']
-
-#dictionary of location of variables in array
-loc_in = model_info['loc_in']
-loc_out = model_info['loc_out']
-
-#inputs and outputs model is  trained on
-input_mins = model_info['train_input_mins']
-input_maxs = model_info['train_input_maxs']
-pv_info = json.load(open('./pvinfo.json'))
-pv_to_sim_factor = pv_info['pv_to_sim_factor']
-sim_to_pv_factor = pv_info['sim_to_pv_factor']
-pv_unit = pv_info['pv_unit']
-pv_name_to_sim_name = pv_info['pv_name_to_sim_name']
-sim_name_to_pv_name = pv_info['sim_name_to_pv_name']
-
-## functions to convert between sim and machine units for data
-def sim_to_machine(sim_vals, 
-                   model_in_list = model_in_list,
-                   loc_in = loc_in,
-                   pv_to_sim_factor = pv_to_sim_factor,
-                   sim_name_to_pv_name = sim_name_to_pv_name):
-
-    pv_vals = np.copy(sim_vals)
-    
-    for i in range(0,len(model_in_list)):
-        pv_vals[:,loc_in[model_in_list[i]]]=np.asarray(sim_vals)[:,loc_in[model_in_list[i]]]/pv_to_sim_factor[sim_name_to_pv_name[model_in_list[i]]]
-    
-    return pv_vals
 
 
-def machine_to_sim(pv_vals, 
-                   model_in_list = model_in_list,
-                   loc_in = loc_in,
-                   pv_to_sim_factor = pv_to_sim_factor,
-                   sim_name_to_pv_name = sim_name_to_pv_name):
-
-    sim_vals = np.copy(pv_vals)
-    
-    for i in range(0,len(model_in_list)):
-        sim_vals[:,loc_in[model_in_list[i]]] = np.asarray(pv_vals)[:,loc_in[model_in_list[i]]]*pv_to_sim_factor[sim_name_to_pv_name[model_in_list[i]]]
-    
-    return sim_vals
 
 class Surrogate_NN:
     
-    def __init__(self, 
-                 model_in_list,
-                 model_out_list,
-                 input_mins,
-                 input_maxs,
-                 pv_name_to_sim_name,
-                 pv_to_sim_factor,
-                 sim_name_to_pv_name,
+    def __init__(self, model_info_file = './model_info.json',
+                 pv_info_file = './pvinfo.json',
                  take_log_out= True
                 ):
+        
+        
+        PATH = ''
+        screen ='OTR2'
+        NAME = 'v3b_cnsga_'
+
+        with open(PATH+NAME+screen+'_list_dict.json') as json_file:
+            json_names = json.load(json_file)
+
+        #inputs and outputs in raw data
+        output_names=json_names['out_'+screen+'_vars']
+        input_names = json_names['input_vars']
+
+        #load model info
+        model_info = json.load(open(model_info_file))
+
+        #inputs and outputs model is  trained on
+        model_in_list = model_info['model_in_list']
+        model_out_list = model_info['model_out_list']
+
+        #dictionary of location of variables in array
+        loc_in = model_info['loc_in']
+        loc_out = model_info['loc_out']
+
+        #inputs and outputs model is  trained on
+        input_mins = model_info['train_input_mins']
+        input_maxs = model_info['train_input_maxs']
+        pv_info = json.load(open(pv_info_file))
+        pv_to_sim_factor = pv_info['pv_to_sim_factor']
+        sim_to_pv_factor = pv_info['sim_to_pv_factor']
+        pv_unit = pv_info['pv_unit']
+        pv_name_to_sim_name = pv_info['pv_name_to_sim_name']
+        sim_name_to_pv_name = pv_info['sim_name_to_pv_name']
         
         #input variable names
         self.model_in_list = model_in_list
@@ -115,6 +85,7 @@ class Surrogate_NN:
         self.pv_name_to_sim_name = pv_name_to_sim_name
         self.pv_to_sim_factor = pv_to_sim_factor
         self.sim_name_to_pv_name = sim_name_to_pv_name
+        
         
     def pred_sim_units(self, x):
     
@@ -164,6 +135,26 @@ class Surrogate_NN:
                 self.transformer_x = pickle.load(open(scalerfilex, 'rb'))
 
                 self.transformer_y = pickle.load(open(scalerfiley, 'rb'))
+                
+                
+    ## functions to convert between sim and machine units for data
+    def sim_to_machine(self,sim_vals):
+        pv_vals = np.copy(sim_vals)
+
+        for i in range(0,len(self.model_in_list)):
+            pv_vals[:,self.loc_in[self.model_in_list[i]]]=np.asarray(sim_vals)[:,self.loc_in[self.model_in_list[i]]]/self.pv_to_sim_factor[self.sim_name_to_pv_name[self.model_in_list[i]]]
+
+        return pv_vals
+
+
+    def machine_to_sim(self,pv_vals):
+
+        sim_vals = np.copy(pv_vals)
+
+        for i in range(0,len(self.model_in_list)):
+            sim_vals[:,self.loc_in[self.model_in_list[i]]] = np.asarray(pv_vals)[:,self.loc_in[self.model_in_list[i]]]*self.pv_to_sim_factor[self.sim_name_to_pv_name[self.model_in_list[i]]]
+
+        return sim_vals
             
 
             
