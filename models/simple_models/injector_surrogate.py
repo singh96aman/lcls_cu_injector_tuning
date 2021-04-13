@@ -25,6 +25,10 @@ from IPython.display import clear_output
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import RobustScaler,MinMaxScaler
 
+PATH = ''
+screen ='OTR2'
+NAME = 'v3b_cnsga_'
+
 with open(PATH+NAME+screen+'_list_dict.json') as json_file:
     json_names = json.load(json_file)
     
