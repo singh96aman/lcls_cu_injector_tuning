@@ -37,36 +37,38 @@ class Emit_Meas():
         self.ml.session.eval("addpath('{}')".format(local_path))
 
     def launch_emittance_measurment(self,):
-
-        self.ml.session.eval('clearvars') #clear variables
-        self.ml.session.eval('[emittance_x,emittance_y,emittance_x_std,emittance_y_std,bmag_x,bmag_y,bmag_x_std,bmag_y_std] = matlab_emittance_calc()')
+        self.emittance_geomean = -1
         
-        
-        self.emittance_x = (self.ml.session.workspace.emittance_x)
-        self.emittance_y = (self.ml.session.workspace.emittance_y)
-        self.emittance_x_std = (self.ml.session.workspace.emittance_x_std)
-        self.emittance_y_std = (self.ml.session.workspace.emittance_y_std)
-        self.bmag_x = (self.ml.session.workspace.bmag_x)
-        self.bmag_y = (self.ml.session.workspace.bmag_y)
-        self.bmag_x_std = (self.ml.session.workspace.bmag_x_std)
-        self.bmag_y_std = (self.ml.session.workspace.bmag_y_std)
-        
-        
-        
-        print('emittance_x',self.emittance_x,'+-',self.emittance_x_std)
-        print('emittance_y',self.emittance_y,'+-',self.emittance_y_std)
-        print('bmag_x',self.bmag_x,'+-',self.bmag_x_std)
-        print('bmag_y',self.bmag_y,'+-',self.bmag_y_std)
-
-        self.emittance_geomean = np.sqrt(self.emittance_x*self.emittance_y)  #gemoetric mean
-        self.bmag_geomean = np.sqrt(self.bmag_x*self.bmag_y)  #gemoetric mean
-
-        print('emittance geomean ',self.emittance_geomean )
-        print('bmag geomean ',self.bmag_geomean )
+        while (self.emittance_geomean > 2) | (self.emittance_geomean < 0.0): #what's the range of a valid emittance?
+            self.ml.session.eval('clearvars')
+            self.ml.session.eval('[emittance_x,emittance_y,emittance_x_std,emittance_y_std,bmag_x,bmag_y,bmag_x_std,bmag_y_std] = matlab_emittance_calc()')
 
 
-        emittance_bmag = self.bmag_geomean * self.emittance_geomean
-        print('emittance * bmag ',emittance_bmag )
+            self.emittance_x = (self.ml.session.workspace.emittance_x)
+            self.emittance_y = (self.ml.session.workspace.emittance_y)
+            self.emittance_x_std = (self.ml.session.workspace.emittance_x_std)
+            self.emittance_y_std = (self.ml.session.workspace.emittance_y_std)
+            self.bmag_x = (self.ml.session.workspace.bmag_x)
+            self.bmag_y = (self.ml.session.workspace.bmag_y)
+            self.bmag_x_std = (self.ml.session.workspace.bmag_x_std)
+            self.bmag_y_std = (self.ml.session.workspace.bmag_y_std)
+
+
+
+            print('emittance_x',self.emittance_x,'+-',self.emittance_x_std)
+            print('emittance_y',self.emittance_y,'+-',self.emittance_y_std)
+            print('bmag_x',self.bmag_x,'+-',self.bmag_x_std)
+            print('bmag_y',self.bmag_y,'+-',self.bmag_y_std)
+
+            self.emittance_geomean = np.sqrt(self.emittance_x*self.emittance_y)  #gemoetric mean
+            self.bmag_geomean = np.sqrt(self.bmag_x*self.bmag_y)  #gemoetric mean
+
+            print('emittance geomean ',self.emittance_geomean )
+            print('bmag geomean ',self.bmag_geomean )
+
+
+            emittance_bmag = self.bmag_geomean * self.emittance_geomean
+            print('emittance * bmag ',emittance_bmag )
 
         return self.emittance_geomean
 
