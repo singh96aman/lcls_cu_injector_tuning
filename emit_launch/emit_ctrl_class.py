@@ -37,7 +37,6 @@ class Emit_Meas():
         self.ml.session.eval("addpath('{}')".format(local_path))
 
     def launch_emittance_measurment(self,):
-        emittance = -1
 
         self.ml.session.eval('clearvars') #clear variables
         self.ml.session.eval('[emittance_x,emittance_y,emittance_x_std,emittance_y_std,bmag_x,bmag_y,bmag_x_std,bmag_y_std] = matlab_emittance_calc()')
