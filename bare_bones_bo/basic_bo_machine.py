@@ -46,4 +46,11 @@ optimizer.maximize(
     n_iter=10,
 )
 
-print(optimizer.max)
+
+SOL_opt = optimizer.max['params']['varx']
+CQ_opt = optimizer.max['params']['vary']
+SQ_opt = optimizer.max['params']['varz']
+print('optimum (pv_units) ',SOL_opt, CQ_opt, SQ_opt)
+
+opt_emit = -1*optimizer.max['target']
+print('optimum geom emit ', opt_emit)
