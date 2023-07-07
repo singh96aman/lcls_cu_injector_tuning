@@ -1,0 +1,24 @@
+name: lume-lcls-cu-inj-nn-tuning
+channels:
+  - pytorch
+  - gpytorch
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pydantic>=1.10.0 # until lume-services registered with conda
+  - tensorflow
+  - keras
+  - pyepics
+  - lume-model>=1.4.6
+  - pip 
+  - jupyterlab
+  - notebook
+  - nb_conda_kernels
+  - pytorch
+  - torchvision 
+  - torchaudio 
+  #- pytorch-cuda=11.7
+  - botorch>=0.8.2
+  - pandas
+  - matplotlib
+  - scikit-learn=0.23.2
