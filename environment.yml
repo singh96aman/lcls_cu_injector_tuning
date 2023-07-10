@@ -5,7 +5,7 @@ channels:
   - conda-forge
 dependencies:
   - python=3.9
-  - pydantic>=1.10.0 # until lume-services registered with conda
+  - pydantic=1.10.9 # until lume-services registered with conda
   - tensorflow
   - keras
   - pyepics
@@ -22,3 +22,9 @@ dependencies:
   - pandas
   - matplotlib
   - scikit-learn=0.23.2
+  - numdifftools
+  - xopt
+  - pip 
+  - pip:
+    - git+https://github.com/slaclab/lume-model.git
+#prefix: '/sdf/group/ard/thakur12/envs'
